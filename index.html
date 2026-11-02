@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+d<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -122,7 +122,7 @@
     }
   }
 
-  snapBtn.addEventListener('click', async () => {
+snapBtn.addEventListener('click', async () => {
     snapBtn.disabled = true;
     statusDiv.style.color = "#333";
     statusDiv.innerText = "Capturing photo...";
@@ -134,31 +134,38 @@
 
     const ctx = canvas.getContext('2d');
 
-    // 1. Draw template background
+    // 1. Draw template background frame
     ctx.drawImage(overlayImg, 0, 0, outWidth, outHeight);
 
-    // 2. Calculate dimensions for inner window cutout
+    // 2. Cutout area for camera feed
     const cutoutX = outWidth * 0.245;
     const cutoutY = outHeight * 0.23;
     const cutoutW = outWidth * 0.51;
     const cutoutH = outHeight * 0.54;
 
-    // 3. Draw live video feed into cutout area
+    // 3. Render camera feed into cutout box
     ctx.drawImage(video, cutoutX, cutoutY, cutoutW, cutoutH);
 
-    // 4. Redraw template frame over the video to give clean crisp edges
+    // 4. Redraw template on top for clean edges
     ctx.drawImage(overlayImg, 0, 0, outWidth, outHeight);
 
-    const imageData = canvas.toDataURL('image/jpeg', 0.9);
+    const imageData = canvas.toDataURL('image/jpeg', 0.85);
     const guestName = document.getElementById('guestName').value || "Guest";
 
     statusDiv.innerText = "Saving directly to Google Drive...";
 
+    // Prepare payload as URL-encoded parameters to bypass CORS preflight
+    const params = new URLSearchParams();
+    params.append("image", imageData);
+    params.append("name", guestName);
+
     try {
       const response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ image: imageData, name: guestName })
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        },
+        body: params.toString()
       });
 
       const result = await response.json();
