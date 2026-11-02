@@ -1,4 +1,4 @@
-d<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -100,7 +100,6 @@ d<!DOCTYPE html>
 </div>
 
 <script>
-  // Paste your deployed Google Apps Script Web App URL here
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0TWYeuoLnPikDrvXxQ8jLHB0fpkzy8levtky-2GC_VQDJdsnMbRFACOMfNNPmbQQiMg/exec";
 
   const video = document.getElementById('webcam');
@@ -122,7 +121,7 @@ d<!DOCTYPE html>
     }
   }
 
-snapBtn.addEventListener('click', async () => {
+  snapBtn.addEventListener('click', async () => {
     snapBtn.disabled = true;
     statusDiv.style.color = "#333";
     statusDiv.innerText = "Capturing photo...";
@@ -154,7 +153,6 @@ snapBtn.addEventListener('click', async () => {
 
     statusDiv.innerText = "Saving directly to Google Drive...";
 
-    // Prepare payload as URL-encoded parameters to bypass CORS preflight
     const params = new URLSearchParams();
     params.append("image", imageData);
     params.append("name", guestName);
