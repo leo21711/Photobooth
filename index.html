@@ -803,7 +803,7 @@
     const CONFIG = {
       // The Web app URL from Apps Script (Deploy > Manage deployments).
       // It must end with /exec
-      SCRIPT_URL: 'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE',
+      SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyseyzaWb2Jw2fiXoHC0vItDrS9Wh4K8uX54ZO9W7UentAtkyWp8IJAYQs6aIfU54cQ/exec',
 
       // Must match SHARED_TOKEN in Code.gs ('' = no token).
       TOKEN: '',
@@ -1511,7 +1511,7 @@
       });
 
       // text/plain keeps this a "simple" request, so no CORS preflight is needed.
-      fetch(https://script.google.com/macros/s/AKfycbyseyzaWb2Jw2fiXoHC0vItDrS9Wh4K8uX54ZO9W7UentAtkyWp8IJAYQs6aIfU54cQ/exec, {
+      fetch(CONFIG.SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ image: base64Data, token: CONFIG.TOKEN })
