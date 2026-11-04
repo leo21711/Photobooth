@@ -778,6 +778,20 @@
     // rather than through inline onclick attributes.
     window.addEventListener('DOMContentLoaded', function () {
 
+    // Intro button first, so it works even if something further down fails.
+    document.getElementById('startBtn').addEventListener('click', function () {
+      document.getElementById('introPage').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
+    });
+
+    // The two libraries come from CDNs; tell the guest plainly if one is missing.
+    if (typeof fabric === 'undefined' || typeof Swal === 'undefined') {
+      console.error('Library missing. fabric:', typeof fabric, 'Swal:', typeof Swal);
+      alert('Some page components did not load. Please check your connection, ' +
+            'turn off any content blocker for this page, and reload.');
+      return;
+    }
+
     // =====================================================
     // 1. INITIAL CONFIGURATION
     // =====================================================
@@ -1539,14 +1553,6 @@
     document.getElementById('saveBtn').addEventListener('click', uploadToGuestbook);
     document.getElementById('downloadBtn').addEventListener('click', downloadPhoto);
 
-    // =====================================================
-    // 17. INTRO PAGE TRANSITION
-    // =====================================================
-    
-    document.getElementById('startBtn').addEventListener('click', function() {
-      document.getElementById('introPage').style.display = 'none';
-      document.getElementById('mainApp').style.display = 'block';
-    });
 
     });  // end DOMContentLoaded
   </script>
