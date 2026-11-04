@@ -1537,15 +1537,13 @@
             return;
           }
 
-          Swal.fire({
-            title: 'Saved successfully!',
-            text: 'Your memory has been added to our guestbook.',
-            icon: 'success',
-            confirmButtonText: 'View Photo',
-            confirmButtonColor: PALETTE.sageDark
-          }).then((choice) => {
-            if (choice.isConfirmed) {
-              window.open(result.url, '_blank');
+Swal.fire({
+  title: 'Saved successfully!',
+  text: 'Your memory has been added to our guestbook.',
+  icon: 'success',
+  confirmButtonText: 'Done',
+  confirmButtonColor: PALETTE.sageDark
+});
             }
           });
         })
