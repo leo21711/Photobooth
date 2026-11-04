@@ -666,6 +666,16 @@
         font-size: 18px;
       }
     }
+  /* Front page text: dark terracotta */
+.intro-content,
+.intro-content .eyebrow,
+.intro-content h1,
+.intro-content p,
+.intro-content li,
+.intro-content strong {
+  color: var(--terracotta-dark) !important;
+}
+  
   </style>
 </head>
 
@@ -1034,7 +1044,7 @@
 
       label.innerText = uploadedImages[targetSlot]
         ? `Replace Photo ${targetSlot + 1}`
-        : `Upload Photo ${targetSlot + 1} of ${total}`;
+        : `Upload/Take Selfie Photo ${targetSlot + 1} of ${total}`;
 
       const allFilled = total > 0 && uploadedImages.every(Boolean);
 
