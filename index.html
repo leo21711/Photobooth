@@ -694,6 +694,14 @@
       <button id="startBtn" class="btn btn-primary" style="width: 100%; max-width: 250px; padding: 15px 20px; font-size: 16px; margin: 0 auto;">
         Have Fun Snapping ✨
       </button>
+      <script>
+        // Runs the moment the button exists. It does not wait for the CDN
+        // libraries, so the intro page can never get stuck.
+        document.getElementById('startBtn').addEventListener('click', function () {
+          document.getElementById('introPage').style.display = 'none';
+          document.getElementById('mainApp').style.display = 'block';
+        });
+      </script>
     </div>
   </div>
 
@@ -778,11 +786,6 @@
     // rather than through inline onclick attributes.
     window.addEventListener('DOMContentLoaded', function () {
 
-    // Intro button first, so it works even if something further down fails.
-    document.getElementById('startBtn').addEventListener('click', function () {
-      document.getElementById('introPage').style.display = 'none';
-      document.getElementById('mainApp').style.display = 'block';
-    });
 
     // The two libraries come from CDNs; tell the guest plainly if one is missing.
     if (typeof fabric === 'undefined' || typeof Swal === 'undefined') {
