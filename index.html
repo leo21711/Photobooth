@@ -80,7 +80,7 @@
     }
 
     /* =====================================================
-       NEW: INTRO PAGE STYLES
+       INTRO PAGE STYLES
     ===================================================== */
     .intro-container {
       position: fixed;
@@ -106,8 +106,8 @@
       -webkit-backdrop-filter: blur(10px);
       box-shadow: 0 12px 40px rgba(0,0,0,0.15);
       animation: fadeIn 1s ease-out;
-      
-      /* Updated to make a longer rectangle that fits mobile */
+
+      /* Longer rectangle that fits mobile */
       width: 90%;
       max-width: 400px;
       display: flex;
@@ -666,16 +666,16 @@
         font-size: 18px;
       }
     }
-  /* Front page text: dark terracotta */
-.intro-content,
-.intro-content .eyebrow,
-.intro-content h1,
-.intro-content p,
-.intro-content li,
-.intro-content strong {
-  color: var(--terracotta-dark) !important;
-}
-  
+
+    /* Front page text: dark terracotta */
+    .intro-content,
+    .intro-content .eyebrow,
+    .intro-content h1,
+    .intro-content p,
+    .intro-content li,
+    .intro-content strong {
+      color: var(--terracotta-dark) !important;
+    }
   </style>
 </head>
 
@@ -685,7 +685,7 @@
     <div class="intro-content">
       <div class="eyebrow" style="color: var(--gold-light); margin-bottom: 12px;">The Wedding Celebration</div>
       <h1 style="color: var(--white); margin: 0 0 10px 0; font-size: 36px;">Fira &amp; Baqi</h1>
-      
+
       <p style="color: var(--ivory); font-style: italic; font-size: 16px; margin: 0 0 25px 0;">
         Welcome to our wedding memory booth! 📸✨
       </p>
@@ -751,7 +751,7 @@
             <input type="file" id="imageLoader" accept="image/*">
             <span class="upload-icon">▧</span>
             <span class="upload-label-content">
-              <span id="uploadLabelText">Upload Photo</span>
+              <span id="uploadLabelText">Upload/Take Selfie</span>
               <small>Choose from gallery or take a photo</small>
             </span>
           </label>
@@ -796,7 +796,6 @@
     // rather than through inline onclick attributes.
     window.addEventListener('DOMContentLoaded', function () {
 
-
     // The two libraries come from CDNs; tell the guest plainly if one is missing.
     if (typeof fabric === 'undefined' || typeof Swal === 'undefined') {
       console.error('Library missing. fabric:', typeof fabric, 'Swal:', typeof Swal);
@@ -819,14 +818,15 @@
       TOKEN: '',
 
       // Increase when you replace a frame PNG, so guests never see an old cached copy.
-      FRAME_VERSION: 1,
+      FRAME_VERSION: 2,
 
-      // Frame PNGs sit in the repository, in the "frames" folder.
+      // Frame PNGs sit in the repository root, next to this index.html.
+      // File names are case-sensitive on GitHub Pages: keep them lower case.
       FRAMES: {
-        template1: { name: 'Frame 1', src: 'frame1.png' },   // 1st.png (1 window)
-        template2: { name: 'Frame 2', src: 'frame2.png' },   // 4th.png (2 windows)
-        template3: { name: 'Frame 3', src: 'frame3.png' },   // 3rd__1_.png (1 window)
-        template4: { name: 'Frame 4', src: 'frame4.png' }    // 2nd__1_.png (3 windows)
+        template1: { name: 'Frame 1', src: 'frame1.png' },   // 1 window
+        template2: { name: 'Frame 2', src: 'frame2.png' },   // 2 windows
+        template3: { name: 'Frame 3', src: 'frame3.png' },   // 1 window
+        template4: { name: 'Frame 4', src: 'frame4.png' }    // 3 windows
       }
     };
     // --------------------------------------------------------------------
@@ -865,7 +865,7 @@
 
     // Per-session caches: a frame is downloaded once and its photo
     // windows are detected once.
-    const framePromises = {};   // key -> Promise<dataUrl>
+    const framePromises = {};   // key -> Promise<src>
     const windowCache = {};     // key -> detected slot rectangles
 
     const templateContainer = document.getElementById('templateSelector');
@@ -1124,7 +1124,7 @@
           const probe = new Image();
 
           probe.onload = () => resolve(src);
-          probe.onerror = () => reject(new Error('frame failed to load'));
+          probe.onerror = () => reject(new Error('frame failed to load: ' + src));
           probe.src = src;
         });
 
@@ -1179,8 +1179,10 @@
       document.getElementById('slotSelector').innerHTML = '';
       document.getElementById('previewStatusText').innerText = 'Loading frame…';
 
-      function showLoadError() {
+      function showLoadError(err) {
         if (myToken !== loadToken) return;
+
+        console.error('Frame load error:', err);
 
         document.getElementById('previewStatusText').innerText = 'Frame unavailable';
 
@@ -1191,7 +1193,7 @@
         );
       }
 
-      fetchFrame(key).then(function (dataUrl) {
+      fetchFrame(key).then(function (src) {
         if (myToken !== loadToken) return;
 
         const imgEl = new Image();
@@ -1248,7 +1250,7 @@
         };
 
         imgEl.onerror = showLoadError;
-        imgEl.src = dataUrl;
+        imgEl.src = src;
       }).catch(showLoadError);
     }
 
@@ -1537,14 +1539,12 @@
             return;
           }
 
-Swal.fire({
-  title: 'Saved successfully!',
-  text: 'Your memory has been added to our guestbook.',
-  icon: 'success',
-  confirmButtonText: 'Done',
-  confirmButtonColor: PALETTE.sageDark
-});
-            }
+          Swal.fire({
+            title: 'Saved successfully!',
+            text: 'Your memory has been added to our guestbook.',
+            icon: 'success',
+            confirmButtonText: 'Done',
+            confirmButtonColor: PALETTE.sageDark
           });
         })
         .catch(function () {
