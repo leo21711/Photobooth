@@ -1,1571 +1,727 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#EFE9DD">
-  <title>Wedding Photobooth | Fira &amp; Baqi</title>
-
-  <!-- Libraries (deferred so they do not block the first paint) -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <!-- Fonts: only the weights actually used -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
-
-  <style>
-    /* =====================================================
-       1. WEDDING COLOUR PALETTE
-    ===================================================== */
-    :root {
-      --ivory: #EFE9DD;
-      --cream: #F9F6F0;
-      --white: #FFFFFF;
-
-      --sage: #98A48D;
-      --sage-dark: #7D8972;
-      --light-sage: #C4C8B6;
-
-      --terracotta: #C4694A;
-      --terracotta-dark: #A95137;
-      --terracotta-cream: #E9C5B3;
-
-      --taupe: #B9A698;
-      --dark-taupe: #796657;
-
-      --gold: #D9B98C;
-      --gold-light: #E8D6B9;
-
-      --text-primary: #55483F;
-      --text-secondary: #88796B;
-
-      --border: #DED2C2;
-      --shadow: rgba(91, 74, 55, 0.10);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      min-height: 100%;
-      background: var(--ivory);
-      -webkit-text-size-adjust: 100%;
-    }
-
-    body {
-      min-height: 100%;
-      margin: 0;
-      padding: 24px 14px 40px;
-      background:
-        radial-gradient(circle at 5% 5%, rgba(196, 200, 182, 0.22), transparent 30%),
-        radial-gradient(circle at 95% 90%, rgba(233, 197, 179, 0.20), transparent 30%),
-        var(--ivory);
-      font-family: 'Source Sans 3', sans-serif;
-      color: var(--text-primary);
-      text-align: center;
-      overscroll-behavior-y: contain;
-    }
-
-    button,
-    input,
-    label {
-      font-family: inherit;
-    }
-
-    button {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    /* =====================================================
-       INTRO PAGE STYLES
-    ===================================================== */
-    .intro-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, var(--sage-dark), var(--sage));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      text-align: center;
-      padding: 20px;
-    }
-
-    .intro-content {
-      background: rgba(255, 255, 255, 0.15);
-      padding: 40px 25px;
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-      animation: fadeIn 1s ease-out;
-
-      /* Longer rectangle that fits mobile */
-      width: 90%;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* =====================================================
-       2. MAIN APPLICATION CONTAINER
-    ===================================================== */
-    .app-container {
-      position: relative;
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 36px 34px 28px;
-      background: var(--cream);
-      border: 1px solid rgba(217, 185, 140, 0.65);
-      border-radius: 24px;
-      box-shadow:
-        0 12px 40px var(--shadow),
-        0 2px 8px rgba(91, 74, 55, 0.04);
-      overflow: hidden;
-    }
-
-    .app-container::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 10%;
-      width: 80%;
-      height: 3px;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        var(--gold),
-        var(--terracotta-cream),
-        var(--gold),
-        transparent
-      );
-    }
-
-    /* =====================================================
-       3. WEDDING HEADER
-    ===================================================== */
-    .wedding-header {
-      margin-bottom: 32px;
-    }
-
-    .eyebrow {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 10px;
-      color: var(--dark-taupe);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-    }
-
-    .eyebrow::before,
-    .eyebrow::after {
-      content: "";
-      width: 35px;
-      height: 1px;
-      background: var(--gold);
-    }
-
-    h1 {
-      margin: 0;
-      color: #666F5B;
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(27px, 6vw, 39px);
-      font-weight: 500;
-      font-style: italic;
-      line-height: 1.25;
-    }
-
-    .couple-name {
-      margin-top: 10px;
-      color: var(--terracotta);
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(20px, 5vw, 27px);
-      font-weight: 500;
-      letter-spacing: 5px;
-    }
-
-    .header-subtitle {
-      margin-top: 8px;
-      color: var(--text-secondary);
-      font-family: 'Playfair Display', serif;
-      font-size: 14px;
-      font-style: italic;
-    }
-
-    .header-divider {
-      width: 70px;
-      height: 1px;
-      margin: 22px auto 0;
-      background: var(--gold);
-    }
-
-    /* =====================================================
-       4. SECTION HEADINGS
-    ===================================================== */
-    .section-heading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin: 0 0 16px;
-      color: var(--dark-taupe);
-      font-family: 'Playfair Display', serif;
-      font-size: 15px;
-      font-weight: 500;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .section-heading::before,
-    .section-heading::after {
-      content: "";
-      flex: 1;
-      max-width: 75px;
-      height: 1px;
-      background: var(--gold-light);
-    }
-
-    /* =====================================================
-       5. FRAME TEMPLATE SELECTOR
-    ===================================================== */
-    .template-section {
-      margin-bottom: 28px;
-    }
-
-    .template-selector {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 9px;
-    }
-
-    .template-btn {
-      min-width: 0;
-      padding: 13px 5px;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      color: var(--dark-taupe);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-
-    .template-btn:hover {
-      background: #F0EDE4;
-      border-color: var(--sage);
-    }
-
-    .template-btn.active {
-      background: var(--sage);
-      border: 2px solid var(--sage-dark);
-      color: white;
-      box-shadow: 0 4px 10px rgba(125, 137, 114, 0.18);
-    }
-
-    /* =====================================================
-       6. INSTRUCTIONS
-    ===================================================== */
-    .instruction-wrapper {
-      margin: 0 0 22px;
-      padding: 12px 14px;
-      background: rgba(196, 200, 182, 0.17);
-      border-radius: 10px;
-    }
-
-    #instructionText {
-      margin: 0;
-      color: var(--text-secondary);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    /* =====================================================
-       7. PHOTO SLOT SELECTOR
-    ===================================================== */
-    .slot-selector {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-
-    .slot-btn {
-      padding: 9px 15px;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text-secondary);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .slot-btn:hover {
-      border-color: var(--sage);
-    }
-
-    .slot-btn.active {
-      background: var(--light-sage);
-      border-color: var(--sage-dark);
-      color: #4F5947;
-    }
-
-    .slot-btn.filled::after {
-      content: " ✓";
-      color: var(--sage-dark);
-    }
-
-    /* =====================================================
-       8. UPLOAD BUTTON
-    ===================================================== */
-    .upload-section {
-      margin-bottom: 25px;
-    }
-
-    .upload-row {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-
-    .custom-file-upload {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      min-height: 82px;
-      padding: 14px 10px;
-      background: var(--terracotta);
-      border: 1px solid var(--terracotta);
-      border-radius: 15px;
-      color: white;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      box-shadow: 0 4px 12px rgba(196, 105, 74, 0.12);
-    }
-
-    .custom-file-upload:hover {
-      background: var(--terracotta-dark);
-      transform: translateY(-2px);
-    }
-
-    .upload-icon {
-      font-size: 25px;
-      line-height: 1;
-    }
-
-    .upload-label-content {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
-      text-align: left;
-    }
-
-    .upload-label-content small {
-      font-size: 11px;
-      font-weight: 400;
-      opacity: 0.9;
-    }
-
-    input[type="file"] {
-      display: none;
-    }
-
-    /* =====================================================
-       9. PHOTO PREVIEW AND FABRIC CANVAS
-    ===================================================== */
-    .preview-section {
-      margin-top: 10px;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.48);
-      border: 1px solid var(--gold);
-      border-radius: 18px;
-      box-shadow: 0 5px 18px rgba(91, 74, 55, 0.04);
-    }
-
-    .preview-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .preview-title {
-      color: var(--dark-taupe);
-      font-family: 'Playfair Display', serif;
-      font-size: 15px;
-      letter-spacing: 1.5px;
-      text-align: left;
-    }
-
-    .preview-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 10px;
-      background: rgba(152, 164, 141, 0.18);
-      border-radius: 20px;
-      color: var(--sage-dark);
-      font-size: 11px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--sage);
-    }
-
-    .canvas-container {
-      margin: 0 auto 16px auto !important;
-      width: 100% !important;
-      height: auto !important;
-      background-color: #E8E5DD;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 3px 12px rgba(91, 74, 55, 0.10);
-      position: relative;
-      touch-action: auto;
-    }
-
-    .canvas-container .lower-canvas {
-      width: 100% !important;
-      height: auto !important;
-      position: relative !important;
-      touch-action: auto;
-    }
-
-    .canvas-container .upper-canvas {
-      width: 100% !important;
-      height: 100% !important;
-      position: absolute !important;
-      left: 0 !important;
-      top: 0 !important;
-      touch-action: auto;
-    }
-
-    /* =====================================================
-       10. FINAL ACTION BUTTONS
-    ===================================================== */
-    .button-group {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .btn {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 9px;
-      width: 100%;
-      min-height: 52px;
-      padding: 13px 20px;
-      background: var(--sage);
-      border: none;
-      border-radius: 30px;
-      color: white;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-
-    .btn:hover {
-      background: var(--sage-dark);
-      transform: translateY(-1px);
-    }
-
-    .btn-primary {
-      background: var(--terracotta);
-    }
-
-    .btn-primary:hover {
-      background: var(--terracotta-dark);
-    }
-
-    .btn-secondary {
-      background: #F0E9DF;
-      border: 1px solid var(--gold);
-      color: var(--dark-taupe);
-    }
-
-    .btn-secondary:hover {
-      background: #E9DDCE;
-    }
-
-    /* =====================================================
-       11. FOOTER
-    ===================================================== */
-    .wedding-footer {
-      margin-top: 27px;
-      padding-top: 17px;
-      border-top: 1px solid var(--gold-light);
-      color: var(--text-secondary);
-      font-family: 'Playfair Display', serif;
-      font-size: 13px;
-      font-style: italic;
-    }
-
-    .footer-names {
-      color: var(--terracotta);
-    }
-
-    /* =====================================================
-       12. SWEETALERT CUSTOM STYLING
-    ===================================================== */
-    .swal2-popup {
-      font-family: 'Source Sans 3', sans-serif !important;
-      border-radius: 18px !important;
-      background: var(--cream) !important;
-      color: var(--text-primary) !important;
-    }
-
-    .swal2-title {
-      font-family: 'Playfair Display', serif !important;
-      font-weight: 600 !important;
-      color: var(--dark-taupe) !important;
-    }
-
-    .swal2-html-container {
-      color: var(--text-secondary) !important;
-    }
-
-    .swal2-confirm {
-      border-radius: 25px !important;
-      font-family: 'Source Sans 3', sans-serif !important;
-    }
-
-    /* =====================================================
-       13. MOBILE RESPONSIVENESS
-    ===================================================== */
-    @media (max-width: 600px) {
-      body {
-        padding: 14px 10px 25px;
-      }
-
-      .app-container {
-        padding: 27px 17px 22px;
-        border-radius: 20px;
-      }
-
-      .wedding-header {
-        margin-bottom: 25px;
-      }
-
-      .eyebrow {
-        font-size: 9px;
-        letter-spacing: 2px;
-      }
-
-      .couple-name {
-        letter-spacing: 4px;
-      }
-
-      .header-subtitle {
-        font-size: 12px;
-      }
-
-      .template-selector {
-        gap: 6px;
-      }
-
-      .template-btn {
-        padding: 12px 3px;
-        font-size: 12px;
-        border-radius: 11px;
-      }
-
-      .section-heading {
-        font-size: 12px;
-        letter-spacing: 1.5px;
-      }
-
-      .section-heading::before,
-      .section-heading::after {
-        max-width: 45px;
-      }
-
-      .upload-row {
-        gap: 9px;
-      }
-
-      .custom-file-upload {
-        min-height: 76px;
-        padding: 10px 7px;
-        gap: 7px;
-        font-size: 14px;
-        border-radius: 12px;
-      }
-
-      .upload-icon {
-        font-size: 21px;
-      }
-
-      .upload-label-content small {
-        font-size: 10px;
-      }
-
-      .preview-section {
-        padding: 10px;
-      }
-
-      .preview-title {
-        font-size: 13px;
-      }
-
-      .preview-status {
-        font-size: 10px;
-        padding: 5px 8px;
-      }
-
-      .btn {
-        min-height: 49px;
-        font-size: 14px;
-      }
-    }
-
-    @media (max-width: 360px) {
-      .app-container {
-        padding-left: 12px;
-        padding-right: 12px;
-      }
-
-      .custom-file-upload {
-        font-size: 12px;
-      }
-
-      .upload-icon {
-        font-size: 18px;
-      }
-    }
-
-    /* Front page text: dark terracotta */
-    .intro-content,
-    .intro-content .eyebrow,
-    .intro-content h1,
-    .intro-content p,
-    .intro-content li,
-    .intro-content strong {
-      color: var(--terracotta-dark) !important;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#F8EEE2">
+<title>Wedding Photobooth | Fira &amp; Baqi</title>
+
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+
+<style>
+/* 1. PALETTE AND FONTS */
+:root{
+  --bg:#F8EEE2; --cream:#FBF4EA; --white:#FFF;
+  --sage:#98A48D; --sage-dark:#7D8972; --olive:#6B7358; --light-sage:#C4C8B6;
+  --terracotta:#C4694A; --terracotta-dark:#A95137;
+  --gold:#D9B98C; --gold-light:#E6D3B8;
+  --brown:#6E4F3C; --brown-soft:#8A7260;
+  --shadow:rgba(91,74,55,.12);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --title:'Playfair Display','Cormorant Garamond',serif;
+}
+*{box-sizing:border-box}
+html{min-height:100%;background:var(--bg);-webkit-text-size-adjust:100%}
+body{
+  min-height:100%;margin:0;padding:24px 14px 40px;text-align:center;
+  background:radial-gradient(circle at 0 0,rgba(233,197,179,.35),transparent 35%),
+             radial-gradient(circle at 100% 100%,rgba(196,200,182,.30),transparent 35%),var(--bg);
+  font-family:var(--serif);font-size:17px;color:var(--brown);overscroll-behavior-y:contain;
+}
+button,input,label{font-family:inherit}
+button{-webkit-tap-highlight-color:transparent}
+.ico{width:28px;height:28px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* 2. FLORAL CORNERS (inline SVG; swap for PNGs later if you like) */
+.fl{position:absolute;width:190px;height:190px;pointer-events:none;opacity:.95}
+.fl.tl{top:0;left:0}
+.fl.tr{top:0;right:0;transform:scaleX(-1);opacity:.55}
+.fl.bl{bottom:0;left:0;transform:scaleY(-1);opacity:.55}
+.fl.br{bottom:0;right:0;transform:scale(-1,-1)}
+.fl-small{width:140px;height:140px}
+
+/* 3. INTRO PAGE */
+.intro-container{
+  position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:radial-gradient(circle at 0 0,rgba(233,197,179,.45),transparent 40%),var(--bg);overflow:hidden;
+}
+.intro-content{
+  position:relative;z-index:1;width:92%;max-width:400px;padding:36px 26px;
+  background:rgba(251,244,234,.88);border:1px solid var(--gold);border-radius:24px;
+  box-shadow:0 12px 40px var(--shadow);animation:fadeIn 1s ease-out;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.intro-content h1{font-size:40px}
+.intro-tagline{margin:10px 0 22px;font-style:italic;font-size:20px;color:var(--brown-soft)}
+.intro-body{text-align:left;font-size:17px;line-height:1.5;margin-bottom:22px}
+.intro-body p{margin:0 0 10px}
+.intro-body ul{margin:0 0 14px;padding-left:20px}
+.intro-body li{margin-bottom:6px}
+.intro-body small{display:block;font-size:15px;line-height:1.4;color:var(--brown-soft)}
+.intro-body strong{color:var(--terracotta-dark)}
+
+/* 4. MAIN CONTAINER AND HEADER */
+.app-container{
+  position:relative;max-width:680px;margin:0 auto;padding:44px 30px 30px;overflow:hidden;
+  background:linear-gradient(180deg,#FBF4EA,#F9ECDF);
+  border:1px solid rgba(217,185,140,.65);border-radius:26px;box-shadow:0 12px 40px var(--shadow);
+}
+.app-container>*:not(.fl){position:relative;z-index:1}
+.eyebrow{
+  display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:6px;
+  color:var(--brown-soft);font-size:14px;font-weight:600;letter-spacing:3px;text-transform:uppercase;
+}
+.eyebrow::before,.eyebrow::after{content:"";width:50px;height:1px;background:var(--gold)}
+h1{margin:0;color:var(--olive);font-family:var(--title);font-size:clamp(34px,8vw,54px);font-weight:500;font-style:italic;line-height:1.2}
+.couple-name{margin-top:6px;color:var(--terracotta);font-size:clamp(24px,6vw,36px);font-weight:600;letter-spacing:8px}
+.header-subtitle{margin-top:4px;color:var(--brown-soft);font-size:clamp(17px,4vw,21px);font-style:italic;font-weight:500}
+.header-divider{display:flex;align-items:center;justify-content:center;gap:12px;margin:18px auto 26px;max-width:260px;color:#A5654B;font-size:14px}
+.header-divider::before,.header-divider::after{content:"";flex:1;height:1px;background:var(--gold)}
+
+/* 5. SECTION HEADINGS */
+.section-heading{
+  display:flex;align-items:center;justify-content:center;gap:14px;margin:0 0 16px;
+  color:var(--brown);font-size:clamp(15px,3.8vw,20px);font-weight:600;letter-spacing:3px;text-transform:uppercase;
+}
+.section-heading::before,.section-heading::after{content:"";flex:1;max-width:140px;height:1px;background:var(--gold-light)}
+
+/* 6. FRAME SELECTOR */
+.template-section{margin-bottom:26px}
+.template-selector{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.template-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;padding:10px 4px 12px;
+  background:rgba(255,255,255,.2);border:1px solid var(--gold-light);border-radius:16px;
+  color:var(--brown);cursor:pointer;transition:all .25s ease;
+}
+.tpl-num{font-size:clamp(26px,7vw,36px);font-weight:600;line-height:1.1}
+.tpl-lbl{font-size:clamp(14px,3.5vw,18px);font-weight:500}
+.template-btn:hover{border-color:var(--sage);background:rgba(255,255,255,.5)}
+.template-btn.active{
+  background:var(--sage);color:#fff;border-color:transparent;
+  box-shadow:0 0 0 2px var(--gold),0 6px 14px rgba(125,137,114,.25);
+}
+
+/* 7. INSTRUCTIONS AND SLOTS */
+.instruction-wrapper{margin:0 0 20px;padding:10px 14px;background:rgba(196,200,182,.2);border-radius:12px}
+#instructionText{margin:0;color:var(--brown-soft);font-size:17px;line-height:1.4}
+.slot-selector{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.slot-btn{
+  padding:8px 16px;background:var(--white);border:1px solid var(--gold-light);border-radius:12px;
+  color:var(--brown-soft);font-size:16px;font-weight:600;cursor:pointer;transition:all .2s ease;
+}
+.slot-btn:hover{border-color:var(--sage)}
+.slot-btn.active{background:var(--light-sage);border-color:var(--sage-dark);color:#4F5947}
+.slot-btn.filled::after{content:" ✓";color:var(--sage-dark)}
+
+/* 8. UPLOAD BUTTON (single button, camera icon) */
+.upload-section{margin-bottom:24px}
+.custom-file-upload{
+  display:flex;align-items:center;justify-content:center;gap:16px;min-height:84px;padding:14px 16px;
+  background:var(--terracotta);border-radius:16px;color:#fff;cursor:pointer;
+  box-shadow:0 5px 14px rgba(196,105,74,.22);transition:all .25s ease;
+}
+.custom-file-upload:hover{background:var(--terracotta-dark);transform:translateY(-2px)}
+.custom-file-upload .ico{width:40px;height:40px;stroke-width:1.5}
+.upload-label-content{display:flex;flex-direction:column;align-items:flex-start;text-align:left;line-height:1.15}
+#uploadLabelText{font-size:clamp(20px,5vw,26px);font-weight:600}
+.upload-label-content small{font-size:clamp(14px,3.4vw,16px);opacity:.9}
+input[type="file"]{display:none}
+
+/* 9. PREVIEW */
+.preview-section{padding:16px;background:rgba(255,255,255,.4);border:1px solid var(--gold-light);border-radius:20px}
+.preview-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+.preview-title{color:var(--brown);font-size:clamp(15px,3.8vw,19px);font-weight:600;letter-spacing:2.5px;text-transform:uppercase}
+.preview-status{
+  display:inline-flex;align-items:center;gap:8px;padding:6px 14px;white-space:nowrap;
+  background:rgba(152,164,141,.22);border:1px solid rgba(152,164,141,.35);border-radius:20px;
+  color:var(--brown);font-size:clamp(14px,3.4vw,17px);font-weight:500;
+}
+.status-dot{width:11px;height:11px;border-radius:50%;background:#4FAE5B}
+.canvas-wrap{position:relative;margin-bottom:16px}
+.canvas-container{
+  margin:0 auto!important;width:100%!important;height:auto!important;background:#EFE6DA;border-radius:10px;
+  overflow:hidden;box-shadow:0 3px 12px var(--shadow);position:relative;touch-action:auto;
+}
+.canvas-container .lower-canvas{width:100%!important;height:auto!important;position:relative!important;touch-action:auto}
+.canvas-container .upper-canvas{width:100%!important;height:100%!important;position:absolute!important;left:0!important;top:0!important;touch-action:auto}
+.drag-hint{
+  position:absolute;left:50%;top:50%;z-index:5;display:none;flex-direction:column;align-items:center;gap:6px;
+  transform:translate(-50%,-50%);pointer-events:none;
+}
+.drag-hint.show{display:flex}
+.drag-hint .ico{width:44px;height:44px;color:#fff;stroke:#fff;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5))}
+.drag-hint span{padding:8px 16px;background:rgba(85,100,80,.82);border-radius:14px;color:#fff;font-size:17px;font-weight:600}
+
+/* 10. ACTION BUTTONS */
+.button-group{display:none;flex-direction:column;gap:12px}
+.btn{
+  display:flex;justify-content:center;align-items:center;gap:12px;width:100%;min-height:60px;padding:12px 20px;
+  background:var(--sage);border:1px solid transparent;border-radius:40px;color:#fff;
+  font-size:clamp(19px,4.8vw,24px);font-weight:600;cursor:pointer;transition:all .25s ease;
+}
+.btn:hover{background:var(--sage-dark);transform:translateY(-1px)}
+.btn .ico{width:26px;height:26px}
+.btn-primary{background:var(--sage-dark)}
+.btn-primary:hover{background:var(--olive)}
+.btn-secondary{background:rgba(255,255,255,.35);border-color:var(--gold-light);color:var(--brown)}
+.btn-secondary:hover{background:#F3E6D6}
+.intro-content .btn{max-width:260px;margin:0 auto;background:var(--terracotta)}
+.intro-content .btn:hover{background:var(--terracotta-dark)}
+
+/* 11. FOOTER */
+.wedding-footer{
+  display:flex;align-items:center;justify-content:center;gap:14px;margin-top:30px;
+  color:var(--brown-soft);font-size:clamp(16px,4vw,20px);font-style:italic;font-weight:500;
+}
+.wedding-footer::before,.wedding-footer::after{content:"";width:60px;height:1px;background:var(--gold-light)}
+
+/* 12. SWEETALERT */
+.swal2-popup{font-family:var(--serif)!important;font-size:17px!important;border-radius:20px!important;background:var(--cream)!important;color:var(--brown)!important}
+.swal2-title{font-family:var(--title)!important;font-weight:500!important;color:var(--olive)!important}
+.swal2-html-container{color:var(--brown-soft)!important}
+.swal2-confirm{border-radius:25px!important;font-family:var(--serif)!important;font-weight:600!important}
+
+/* 13. MOBILE */
+@media (max-width:600px){
+  body{padding:12px 8px 24px}
+  .app-container{padding:36px 16px 22px;border-radius:22px}
+  .eyebrow{font-size:12px;letter-spacing:2px}
+  .eyebrow::before,.eyebrow::after{width:30px}
+  .couple-name{letter-spacing:6px}
+  .template-selector{gap:7px}
+  .template-btn{border-radius:13px}
+  .section-heading{letter-spacing:2px;gap:10px}
+  .section-heading::before,.section-heading::after{max-width:50px}
+  .preview-section{padding:10px}
+  .btn{min-height:56px}
+  .fl{width:130px;height:130px}
+  .wedding-footer::before,.wedding-footer::after{width:36px}
+}
+</style>
 </head>
 
 <body>
-  <!-- INTRO PAGE -->
-  <div id="introPage" class="intro-container">
-    <div class="intro-content">
-      <div class="eyebrow" style="color: var(--gold-light); margin-bottom: 12px;">The Wedding Celebration</div>
-      <h1 style="color: var(--white); margin: 0 0 10px 0; font-size: 36px;">Fira &amp; Baqi</h1>
+<!-- Reusable floral corner artwork -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="rose">
+      <circle r="24" fill="#F3DFCB"/><circle r="17" fill="#E9C5B3"/>
+      <circle r="10" fill="#D98F72"/><circle r="4" fill="#C4694A"/>
+    </g>
+    <symbol id="corner" viewBox="0 0 200 200">
+      <g fill="#98A48D" opacity=".6">
+        <ellipse cx="95" cy="16" rx="32" ry="8" transform="rotate(12 95 16)"/>
+        <ellipse cx="140" cy="30" rx="28" ry="7" transform="rotate(28 140 30)"/>
+        <ellipse cx="16" cy="95" rx="32" ry="8" transform="rotate(78 16 95)"/>
+        <ellipse cx="30" cy="140" rx="28" ry="7" transform="rotate(62 30 140)"/>
+        <ellipse cx="80" cy="70" rx="30" ry="8" transform="rotate(40 80 70)"/>
+        <ellipse cx="55" cy="95" rx="26" ry="7" transform="rotate(55 55 95)"/>
+      </g>
+      <use href="#rose" x="46" y="46"/>
+      <use href="#rose" x="112" y="22" transform="translate(112 22) scale(.6) translate(-112 -22)"/>
+      <use href="#rose" x="22" y="112" transform="translate(22 112) scale(.6) translate(-22 -112)"/>
+      <use href="#rose" x="84" y="84" transform="translate(84 84) scale(.45) translate(-84 -84)"/>
+    </symbol>
+  </defs>
+</svg>
 
-      <p style="color: var(--ivory); font-style: italic; font-size: 16px; margin: 0 0 25px 0;">
-        Welcome to our wedding memory booth! 📸✨
-      </p>
-
-      <div style="text-align: left; color: var(--ivory); font-size: 14px; line-height: 1.6; margin-bottom: 25px; width: 100%;">
-        <p style="margin: 0 0 10px 0;">Take a photo and customize your frame to capture the moment.</p>
-        <ul style="margin: 0 0 15px 0; padding-left: 20px;">
-          <li style="margin-bottom: 6px;"><strong>Download</strong> to keep a copy on your device.</li>
-          <li><strong>Upload</strong> (optional) to share your photos with us! Uploading saves a copy directly to our private Google Drive album.</li>
-        </ul>
-        <p style="margin: 0; font-size: 13px; opacity: 0.9; line-height: 1.4;">
-          We’d love it if you shared your memories with us, but it's entirely up to you. Nothing is saved unless you choose to upload.
-        </p>
-      </div>
-
-      <button id="startBtn" class="btn btn-primary" style="width: 100%; max-width: 250px; padding: 15px 20px; font-size: 16px; margin: 0 auto;">
-        Have Fun Snapping ✨
-      </button>
-      <script>
-        // Runs the moment the button exists. It does not wait for the CDN
-        // libraries, so the intro page can never get stuck.
-        document.getElementById('startBtn').addEventListener('click', function () {
-          document.getElementById('introPage').style.display = 'none';
-          document.getElementById('mainApp').style.display = 'block';
-        });
-      </script>
+<!-- INTRO PAGE -->
+<div id="introPage" class="intro-container">
+  <svg class="fl tl"><use href="#corner"/></svg>
+  <svg class="fl br"><use href="#corner"/></svg>
+  <div class="intro-content">
+    <div class="eyebrow">The Wedding Celebration</div>
+    <h1>Fira &amp; Baqi</h1>
+    <p class="intro-tagline">Welcome to our wedding memory booth! 📸✨</p>
+    <div class="intro-body">
+      <p>Take a photo and customize your frame to capture the moment.</p>
+      <ul>
+        <li><strong>Download</strong> to keep a copy on your device.</li>
+        <li><strong>Upload</strong> (optional) to share your photos with us! Uploading saves a copy directly to our private Google Drive album.</li>
+      </ul>
+      <small>We’d love it if you shared your memories with us, but it’s entirely up to you. Nothing is saved unless you choose to upload.</small>
     </div>
+    <button id="startBtn" class="btn btn-primary" type="button">Have Fun Snapping ✨</button>
+    <script>
+      // Runs as soon as the button exists, so the intro can never get stuck waiting for the CDN libraries.
+      document.getElementById('startBtn').addEventListener('click', function () {
+        document.getElementById('introPage').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+      });
+    </script>
   </div>
+</div>
 
-  <!-- MAIN APP (Hidden until start button is clicked) -->
-  <div id="mainApp" style="display: none;">
-    <main class="app-container">
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none;">
+  <main class="app-container">
+    <svg class="fl tl"><use href="#corner"/></svg>
+    <svg class="fl tr fl-small"><use href="#corner"/></svg>
+    <svg class="fl bl fl-small"><use href="#corner"/></svg>
+    <svg class="fl br"><use href="#corner"/></svg>
 
-      <!-- WEDDING HEADER -->
-      <header class="wedding-header">
-        <div class="eyebrow">The Wedding Celebration</div>
-        <h1>Wedding Photobooth</h1>
-        <div class="couple-name">FIRA &amp; BAQI</div>
-        <div class="header-subtitle">Capture the beautiful moments · 2026</div>
-        <div class="header-divider"></div>
-      </header>
+    <header class="wedding-header">
+      <div class="eyebrow">The Wedding Celebration</div>
+      <h1>Wedding Photobooth</h1>
+      <div class="couple-name">FIRA &amp; BAQI</div>
+      <div class="header-subtitle">Capture the beautiful moments · 2026</div>
+      <div class="header-divider">♥</div>
+    </header>
 
-      <!-- FRAME TEMPLATE SELECTOR -->
-      <section class="template-section">
-        <h3 class="section-heading">Choose Your Photo Frame</h3>
-        <div class="template-selector" id="templateSelector"></div>
-      </section>
+    <section class="template-section">
+      <h3 class="section-heading">Choose Your Photo Frame</h3>
+      <div class="template-selector" id="templateSelector"></div>
+    </section>
 
-      <!-- INSTRUCTIONS -->
-      <div class="instruction-wrapper">
-        <p id="instructionText">Upload your photos to fill each frame window.</p>
+    <div class="instruction-wrapper"><p id="instructionText">Upload your photos to fill each frame window.</p></div>
+    <div class="slot-selector" id="slotSelector"></div>
+
+    <section class="upload-section">
+      <h3 class="section-heading">Add Your Photo</h3>
+      <label class="custom-file-upload">
+        <input type="file" id="imageLoader" accept="image/*">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M4 8h3l1.6-2.5h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.6"/></svg>
+        <span class="upload-label-content">
+          <span id="uploadLabelText">Upload / Take Photo</span>
+          <small>Choose from gallery or use your camera</small>
+        </span>
+      </label>
+    </section>
+
+    <section class="preview-section">
+      <div class="preview-heading">
+        <div class="preview-title">Your Preview</div>
+        <div class="preview-status"><span class="status-dot"></span><span id="previewStatusText">Loading frame…</span></div>
       </div>
 
-      <!-- PHOTO SLOT SELECTOR -->
-      <div class="slot-selector" id="slotSelector"></div>
-
-      <!-- PHOTO UPLOAD (gallery or camera, chosen by the phone) -->
-      <section class="upload-section">
-        <h3 class="section-heading">Add Your Photo</h3>
-
-        <div class="upload-row">
-          <label class="custom-file-upload">
-            <input type="file" id="imageLoader" accept="image/*">
-            <span class="upload-icon">▧</span>
-            <span class="upload-label-content">
-              <span id="uploadLabelText">Upload/Take Selfie</span>
-              <small>Choose from gallery or take a photo</small>
-            </span>
-          </label>
-        </div>
-      </section>
-
-      <!-- PHOTO PREVIEW -->
-      <section class="preview-section">
-        <div class="preview-heading">
-          <div class="preview-title">Your Preview</div>
-          <div class="preview-status">
-            <span class="status-dot"></span>
-            <span id="previewStatusText">Loading frame…</span>
-          </div>
-        </div>
-
+      <div class="canvas-wrap">
         <canvas id="photoCanvas"></canvas>
-
-        <!-- FINAL ACTION BUTTONS -->
-        <div class="button-group" id="controls">
-          <button class="btn btn-primary" type="button" id="saveBtn">
-            ✨ Save to Guestbook
-          </button>
-
-          <button class="btn btn-secondary" type="button" id="downloadBtn">
-            ↓ Download to Device
-          </button>
+        <div class="drag-hint" id="dragHint">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M12 3l-2.5 2.5M12 3l2.5 2.5M12 21l-2.5-2.5M12 21l2.5-2.5M3 12l2.5-2.5M3 12l2.5 2.5M21 12l-2.5-2.5M21 12l-2.5 2.5"/></svg>
+          <span>Drag to move or resize</span>
         </div>
-      </section>
+      </div>
 
-      <!-- WEDDING FOOTER -->
-      <footer class="wedding-footer">
-        Made with love · <span class="footer-names">Fira &amp; Baqi</span>
-      </footer>
+      <div class="button-group" id="controls">
+        <button class="btn btn-primary" type="button" id="saveBtn">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M4 20 15 9"/><path d="M15 3l1 2.2 2.2 1-2.2 1L15 9.4 14 7.2 11.8 6.2l2.2-1zM19.5 12l.7 1.5 1.5.7-1.5.7-.7 1.5-.7-1.5-1.5-.7 1.5-.7z"/></svg>
+          Save to Guestbook
+        </button>
+        <button class="btn btn-secondary" type="button" id="downloadBtn">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/></svg>
+          Download to Device
+        </button>
+      </div>
+    </section>
 
-    </main>
-  </div>
+    <footer class="wedding-footer">Made with love · Fira &amp; Baqi</footer>
+  </main>
+</div>
 
-  <script>
-    // The libraries above are deferred, so everything that needs them
-    // runs after DOMContentLoaded. Button handlers are attached here
-    // rather than through inline onclick attributes.
-    window.addEventListener('DOMContentLoaded', function () {
+<script>
+window.addEventListener('DOMContentLoaded', function () {
 
-    // The two libraries come from CDNs; tell the guest plainly if one is missing.
-    if (typeof fabric === 'undefined' || typeof Swal === 'undefined') {
-      console.error('Library missing. fabric:', typeof fabric, 'Swal:', typeof Swal);
-      alert('Some page components did not load. Please check your connection, ' +
-            'turn off any content blocker for this page, and reload.');
-      return;
+if (typeof fabric === 'undefined' || typeof Swal === 'undefined') {
+  console.error('Library missing. fabric:', typeof fabric, 'Swal:', typeof Swal);
+  alert('Some page components did not load. Please check your connection, turn off any content blocker for this page, and reload.');
+  return;
+}
+
+// ---- SETTINGS YOU MAY NEED TO EDIT ----
+const CONFIG = {
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyseyzaWb2Jw2fiXoHC0vItDrS9Wh4K8uX54ZO9W7UentAtkyWp8IJAYQs6aIfU54cQ/exec', // must end with /exec
+  TOKEN: '',            // must match SHARED_TOKEN in Code.gs ('' = no token)
+  FRAME_VERSION: 2,     // increase when you replace a frame PNG
+  FRAMES: {             // file names are case-sensitive on GitHub Pages
+    template1: { name: 'Frame 1', src: 'frame1.png' },
+    template2: { name: 'Frame 2', src: 'frame2.png' },
+    template3: { name: 'Frame 3', src: 'frame3.png' },
+    template4: { name: 'Frame 4', src: 'frame4.png' }
+  }
+};
+// ---------------------------------------
+
+const framesData = CONFIG.FRAMES;
+const CANVAS_W = 1080, BLEED = 2, MIN_WINDOW_AREA = 0.02;
+const PALETTE = { sageDark: '#7D8972', terracotta: '#C4694A' };
+
+const canvas = new fabric.Canvas('photoCanvas', {
+  backgroundColor: '#EFE6DA',
+  preserveObjectStacking: true,
+  selection: false,
+  allowTouchScrolling: true   // page still scrolls when a touch starts on empty canvas
+});
+
+let uploadedImages = [], slotPlaceholders = [], slotRects = [];
+let targetSlot = 0, currentTemplateKey = null, loadToken = 0, prefetchStarted = false, hintDone = false;
+const framePromises = {}, windowCache = {};
+const templateContainer = document.getElementById('templateSelector');
+const dragHint = document.getElementById('dragHint');
+
+// "Drag to move or resize" hint: shown once, hidden on first interaction
+function showHint() {
+  if (hintDone) return;
+  dragHint.classList.add('show');
+  setTimeout(hideHint, 4000);
+}
+function hideHint() { hintDone = true; dragHint.classList.remove('show'); }
+canvas.on('object:moving', hideHint);
+canvas.on('object:scaling', hideHint);
+
+// 2. FRAME BUTTONS ("01 Frame")
+let n = 0;
+for (const key in framesData) {
+  if (!framesData[key]) continue;
+  n++;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'template-btn';
+  btn.dataset.key = key;
+  btn.innerHTML = '<span class="tpl-num">' + String(n).padStart(2, '0') + '</span><span class="tpl-lbl">Frame</span>';
+  btn.onclick = () => changeTemplate(key);
+  templateContainer.appendChild(btn);
+  if (!currentTemplateKey) currentTemplateKey = key;
+}
+
+// 3. DETECT TRANSPARENT PHOTO WINDOWS
+function detectWindows(imgEl, W, H) {
+  const off = document.createElement('canvas');
+  off.width = W; off.height = H;
+  const ctx = off.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(imgEl, 0, 0, W, H);
+  const px = ctx.getImageData(0, 0, W, H).data;
+
+  const STEP = 2, gw = Math.ceil(W / STEP), gh = Math.ceil(H / STEP);
+  const clear = new Uint8Array(gw * gh);
+  for (let gy = 0; gy < gh; gy++) {
+    for (let gx = 0; gx < gw; gx++) {
+      const x = Math.min(W - 1, gx * STEP), y = Math.min(H - 1, gy * STEP);
+      if (px[(y * W + x) * 4 + 3] < 128) clear[gy * gw + gx] = 1;
     }
+  }
 
-    // =====================================================
-    // 1. INITIAL CONFIGURATION
-    // =====================================================
+  const seen = new Uint8Array(gw * gh), stack = new Int32Array(gw * gh), found = [];
+  for (let start = 0; start < gw * gh; start++) {
+    if (!clear[start] || seen[start]) continue;
+    let sp = 0, minX = gw, minY = gh, maxX = 0, maxY = 0, count = 0;
+    stack[sp++] = start; seen[start] = 1;
+    while (sp > 0) {
+      const c = stack[--sp], cx = c % gw, cy = (c / gw) | 0;
+      count++;
+      if (cx < minX) minX = cx; if (cx > maxX) maxX = cx;
+      if (cy < minY) minY = cy; if (cy > maxY) maxY = cy;
+      if (cx > 0 && clear[c - 1] && !seen[c - 1]) { seen[c - 1] = 1; stack[sp++] = c - 1; }
+      if (cx < gw - 1 && clear[c + 1] && !seen[c + 1]) { seen[c + 1] = 1; stack[sp++] = c + 1; }
+      if (cy > 0 && clear[c - gw] && !seen[c - gw]) { seen[c - gw] = 1; stack[sp++] = c - gw; }
+      if (cy < gh - 1 && clear[c + gw] && !seen[c + gw]) { seen[c + gw] = 1; stack[sp++] = c + gw; }
+    }
+    if (count * STEP * STEP >= MIN_WINDOW_AREA * W * H) {
+      const left = Math.max(0, minX * STEP - BLEED), top = Math.max(0, minY * STEP - BLEED);
+      const right = Math.min(W, (maxX + 1) * STEP + BLEED), bottom = Math.min(H, (maxY + 1) * STEP + BLEED);
+      found.push({ left: left, top: top, width: right - left, height: bottom - top });
+    }
+  }
+  found.sort((a, b) => Math.abs(a.top - b.top) > 20 ? a.top - b.top : a.left - b.left);
+  return found;
+}
 
-    // ---- SETTINGS YOU MAY NEED TO EDIT ---------------------------------
-    const CONFIG = {
-      // The Web app URL from Apps Script (Deploy > Manage deployments).
-      // It must end with /exec
-      SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyseyzaWb2Jw2fiXoHC0vItDrS9Wh4K8uX54ZO9W7UentAtkyWp8IJAYQs6aIfU54cQ/exec',
+// 4. PHOTO SLOT BUTTONS
+function buildSlotButtons() {
+  const wrap = document.getElementById('slotSelector');
+  wrap.innerHTML = '';
+  if (slotRects.length < 2) return;
+  slotRects.forEach((r, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'slot-btn';
+    b.innerText = 'Photo ' + (i + 1);
+    b.onclick = () => setTargetSlot(i);
+    wrap.appendChild(b);
+  });
+}
+function setTargetSlot(i) { targetSlot = i; refreshUI(); }
 
-      // Must match SHARED_TOKEN in Code.gs ('' = no token).
-      TOKEN: '',
+// 5. REFRESH INTERFACE
+function refreshUI() {
+  const total = slotRects.length;
+  document.querySelectorAll('.slot-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === targetSlot);
+    b.classList.toggle('filled', !!uploadedImages[i]);
+  });
 
-      // Increase when you replace a frame PNG, so guests never see an old cached copy.
-      FRAME_VERSION: 2,
+  document.getElementById('uploadLabelText').innerText = uploadedImages[targetSlot]
+    ? `Replace Photo ${targetSlot + 1}`
+    : (total > 1 ? `Upload / Take Photo ${targetSlot + 1} of ${total}` : 'Upload / Take Photo');
 
-      // Frame PNGs sit in the repository root, next to this index.html.
-      // File names are case-sensitive on GitHub Pages: keep them lower case.
-      FRAMES: {
-        template1: { name: 'Frame 1', src: 'frame1.png' },   // 1 window
-        template2: { name: 'Frame 2', src: 'frame2.png' },   // 2 windows
-        template3: { name: 'Frame 3', src: 'frame3.png' },   // 1 window
-        template4: { name: 'Frame 4', src: 'frame4.png' }    // 3 windows
-      }
-    };
-    // --------------------------------------------------------------------
+  const allFilled = total > 0 && uploadedImages.every(Boolean);
+  document.getElementById('controls').style.display = allFilled ? 'flex' : 'none';
 
-    const framesData = CONFIG.FRAMES;
+  const filled = uploadedImages.filter(Boolean).length;
+  const st = document.getElementById('previewStatusText');
+  st.innerText = (filled === total && total > 0) ? 'Ready to create'
+    : filled > 0 ? `${filled} of ${total} photos added` : 'Ready to capture';
 
-    const CANVAS_W = 1080;
-    const BLEED = 2;
-    const MIN_WINDOW_AREA = 0.02;
+  canvas.requestRenderAll();
+}
 
-    const PALETTE = {
-      sage: '#98A48D',
-      sageDark: '#7D8972',
-      terracotta: '#C4694A',
-      taupe: '#B9A698'
-    };
-
-    const canvas = new fabric.Canvas('photoCanvas', {
-      backgroundColor: '#E8E5DD',
-      preserveObjectStacking: true,
-      selection: false,
-
-      // KEY MOBILE SETTING:
-      // Permit native page scrolling when the touch begins
-      // on empty canvas/decorative frame areas. Fabric.js
-      // still handles touches that begin on interactive objects.
-      allowTouchScrolling: true
+// 6. PLACEHOLDERS
+function createPlaceholders() {
+  slotPlaceholders.forEach(p => p && canvas.remove(p));
+  slotPlaceholders = [];
+  slotRects.forEach((r, i) => {
+    const rect = new fabric.Rect({ left: 0, top: 0, width: r.width, height: r.height, fill: 'rgba(255,255,255,0.65)', strokeWidth: 0 });
+    const text = new fabric.Text('Photo ' + (i + 1), {
+      originX: 'center', originY: 'center', left: r.width / 2, top: r.height / 2,
+      fontSize: 36, fill: '#8A7260', fontFamily: 'Cormorant Garamond', fontWeight: 700
     });
+    const group = new fabric.Group([rect, text], {
+      left: r.left, top: r.top, selectable: false, evented: false,
+      objectCaching: false   // the font may still be arriving
+    });
+    canvas.add(group);
+    slotPlaceholders.push(group);
+  });
+}
 
-    let uploadedImages = [];
-    let slotPlaceholders = [];
-    let slotRects = [];
-    let targetSlot = 0;
-    let currentTemplateKey = null;
-    let loadToken = 0;
+// 7. FRAME LOADING (cached, prefetched)
+function fetchFrame(key) {
+  if (!framePromises[key]) {
+    framePromises[key] = new Promise((resolve, reject) => {
+      const src = framesData[key].src + '?v=' + CONFIG.FRAME_VERSION;
+      const probe = new Image();
+      probe.onload = () => resolve(src);
+      probe.onerror = () => reject(new Error('frame failed to load: ' + src));
+      probe.src = src;
+    });
+    framePromises[key].catch(() => { delete framePromises[key]; });
+  }
+  return framePromises[key];
+}
 
-    // Per-session caches: a frame is downloaded once and its photo
-    // windows are detected once.
-    const framePromises = {};   // key -> Promise<src>
-    const windowCache = {};     // key -> detected slot rectangles
+function prefetchOthers(exceptKey) {
+  Object.keys(framesData).filter(k => k !== exceptKey && framesData[k]).reduce(
+    (chain, k) => chain.then(() => fetchFrame(k)).catch(() => {}),
+    new Promise(resolve => setTimeout(resolve, 800))
+  );
+}
 
-    const templateContainer = document.getElementById('templateSelector');
+// 8. CHANGE FRAME TEMPLATE
+function changeTemplate(key) {
+  if (!framesData[key]) return;
+  currentTemplateKey = key;
+  const myToken = ++loadToken;
 
+  document.querySelectorAll('.template-btn').forEach(b => b.classList.toggle('active', b.dataset.key === key));
 
-    // =====================================================
-    // 2. BUILD FRAME TEMPLATE BUTTONS
-    // =====================================================
+  uploadedImages.forEach(img => img && canvas.remove(img));
+  slotPlaceholders.forEach(p => p && canvas.remove(p));
+  uploadedImages = []; slotPlaceholders = []; slotRects = []; targetSlot = 0;
 
-    for (const key in framesData) {
-      if (!framesData[key]) continue;
+  canvas.setOverlayImage(null, canvas.renderAll.bind(canvas));
+  document.getElementById('controls').style.display = 'none';
+  document.getElementById('slotSelector').innerHTML = '';
+  document.getElementById('previewStatusText').innerText = 'Loading frame…';
 
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'template-btn';
-      btn.dataset.key = key;
-      btn.innerText = framesData[key].name;
-      btn.onclick = () => changeTemplate(key);
+  function showLoadError(err) {
+    if (myToken !== loadToken) return;
+    console.error('Frame load error:', err);
+    document.getElementById('previewStatusText').innerText = 'Frame unavailable';
+    Swal.fire('Unable to load frame', 'Please check your connection and tap the frame button again.', 'error');
+  }
 
-      templateContainer.appendChild(btn);
+  fetchFrame(key).then(function (src) {
+    if (myToken !== loadToken) return;
+    const imgEl = new Image();
 
-      if (!currentTemplateKey) {
-        currentTemplateKey = key;
+    imgEl.onload = function () {
+      if (myToken !== loadToken) return;
+      const H = Math.round(CANVAS_W * imgEl.height / imgEl.width);
+      canvas.setWidth(CANVAS_W);
+      canvas.setHeight(H);
+
+      slotRects = windowCache[key] || (windowCache[key] = detectWindows(imgEl, CANVAS_W, H));
+      if (slotRects.length === 0) {
+        Swal.fire('Frame problem', 'No transparent photo window was found in this frame PNG.', 'error');
+        return;
       }
-    }
 
+      uploadedImages = new Array(slotRects.length).fill(null);
+      document.getElementById('instructionText').innerText =
+        `This frame requires ${slotRects.length} photo(s). Fill each slot below.`;
 
-    // =====================================================
-    // 3. DETECT TRANSPARENT PHOTO WINDOWS
-    // =====================================================
+      createPlaceholders();
+      buildSlotButtons();
 
-    function detectWindows(imgEl, W, H) {
-      const off = document.createElement('canvas');
-      off.width = W;
-      off.height = H;
-
-      const ctx = off.getContext('2d', {
-        willReadFrequently: true
+      const overlay = new fabric.Image(imgEl, {
+        originX: 'left', originY: 'top', left: 0, top: 0,
+        scaleX: CANVAS_W / imgEl.width, scaleY: H / imgEl.height,
+        selectable: false, evented: false
       });
-
-      ctx.drawImage(imgEl, 0, 0, W, H);
-
-      const px = ctx.getImageData(0, 0, W, H).data;
-
-      const STEP = 2;
-      const gw = Math.ceil(W / STEP);
-      const gh = Math.ceil(H / STEP);
-      const clear = new Uint8Array(gw * gh);
-
-      for (let gy = 0; gy < gh; gy++) {
-        for (let gx = 0; gx < gw; gx++) {
-          const x = Math.min(W - 1, gx * STEP);
-          const y = Math.min(H - 1, gy * STEP);
-
-          if (px[(y * W + x) * 4 + 3] < 128) {
-            clear[gy * gw + gx] = 1;
-          }
-        }
-      }
-
-      const seen = new Uint8Array(gw * gh);
-      const stack = new Int32Array(gw * gh);
-      const found = [];
-
-      for (let start = 0; start < gw * gh; start++) {
-        if (!clear[start] || seen[start]) continue;
-
-        let sp = 0;
-        stack[sp++] = start;
-        seen[start] = 1;
-
-        let minX = gw;
-        let minY = gh;
-        let maxX = 0;
-        let maxY = 0;
-        let count = 0;
-
-        while (sp > 0) {
-          const c = stack[--sp];
-          const cx = c % gw;
-          const cy = (c / gw) | 0;
-
-          count++;
-
-          if (cx < minX) minX = cx;
-          if (cx > maxX) maxX = cx;
-          if (cy < minY) minY = cy;
-          if (cy > maxY) maxY = cy;
-
-          if (cx > 0 && clear[c - 1] && !seen[c - 1]) {
-            seen[c - 1] = 1;
-            stack[sp++] = c - 1;
-          }
-
-          if (cx < gw - 1 && clear[c + 1] && !seen[c + 1]) {
-            seen[c + 1] = 1;
-            stack[sp++] = c + 1;
-          }
-
-          if (cy > 0 && clear[c - gw] && !seen[c - gw]) {
-            seen[c - gw] = 1;
-            stack[sp++] = c - gw;
-          }
-
-          if (cy < gh - 1 && clear[c + gw] && !seen[c + gw]) {
-            seen[c + gw] = 1;
-            stack[sp++] = c + gw;
-          }
-        }
-
-        if (count * STEP * STEP >= MIN_WINDOW_AREA * W * H) {
-          const left = Math.max(0, minX * STEP - BLEED);
-          const top = Math.max(0, minY * STEP - BLEED);
-          const right = Math.min(W, (maxX + 1) * STEP + BLEED);
-          const bottom = Math.min(H, (maxY + 1) * STEP + BLEED);
-
-          found.push({
-            left: left,
-            top: top,
-            width: right - left,
-            height: bottom - top
-          });
-        }
-      }
-
-      // Reading order: top to bottom, then left to right.
-      found.sort((a, b) =>
-        (Math.abs(a.top - b.top) > 20
-          ? a.top - b.top
-          : a.left - b.left)
-      );
-
-      return found;
-    }
-
-
-    // =====================================================
-    // 4. BUILD PHOTO SLOT BUTTONS
-    // =====================================================
-
-    function buildSlotButtons() {
-      const wrap = document.getElementById('slotSelector');
-      wrap.innerHTML = '';
-
-      if (slotRects.length < 2) return;
-
-      slotRects.forEach((r, i) => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'slot-btn';
-        b.innerText = 'Photo ' + (i + 1);
-        b.onclick = () => setTargetSlot(i);
-        wrap.appendChild(b);
-      });
-    }
-
-    function setTargetSlot(i) {
-      targetSlot = i;
+      canvas.setOverlayImage(overlay, canvas.renderAll.bind(canvas));
       refreshUI();
-    }
 
+      if (!prefetchStarted) { prefetchStarted = true; prefetchOthers(key); }
+    };
 
-    // =====================================================
-    // 5. REFRESH INTERFACE
-    // =====================================================
+    imgEl.onerror = showLoadError;
+    imgEl.src = src;
+  }).catch(showLoadError);
+}
 
-    function refreshUI() {
-      const total = slotRects.length;
+// 9. START-UP
+if (currentTemplateKey) {
+  changeTemplate(currentTemplateKey);
+} else {
+  Swal.fire('Error', 'No frame templates could be loaded.', 'error');
+}
 
-      document.querySelectorAll('.slot-btn').forEach((b, i) => {
-        b.classList.toggle('active', i === targetSlot);
-        b.classList.toggle('filled', !!uploadedImages[i]);
+if (document.fonts && document.fonts.load) {
+  document.fonts.load('700 36px "Cormorant Garamond"').then(() => canvas.requestRenderAll()).catch(() => {});
+}
+
+// 10. TAP CANVAS TO SELECT A SLOT
+canvas.on('mouse:down', function (opt) {
+  let idx = -1;
+  if (opt.target && uploadedImages.includes(opt.target)) {
+    idx = uploadedImages.indexOf(opt.target);
+  } else {
+    const p = canvas.getPointer(opt.e);
+    idx = slotRects.findIndex(r => p.x >= r.left && p.x <= r.left + r.width && p.y >= r.top && p.y <= r.top + r.height);
+  }
+  if (idx >= 0) setTargetSlot(idx);
+});
+
+// 11. ADD PHOTO TO WINDOW
+function handleFile(file) {
+  if (!file || slotRects.length === 0) return;
+  const slotIndex = targetSlot, r = slotRects[slotIndex], tokenAtStart = loadToken;
+  const reader = new FileReader();
+
+  reader.onload = function (event) {
+    fabric.Image.fromURL(event.target.result, function (img) {
+      if (tokenAtStart !== loadToken) return;
+      const scale = Math.max(r.width / img.width, r.height / img.height);
+      const clip = new fabric.Rect({ left: r.left, top: r.top, width: r.width, height: r.height, absolutePositioned: true });
+
+      img.set({
+        scaleX: scale, scaleY: scale, originX: 'center', originY: 'center',
+        left: r.left + r.width / 2, top: r.top + r.height / 2, clipPath: clip,
+        selectable: true, evented: true, perPixelTargetFind: true, targetFindTolerance: 4,
+        cornerColor: PALETTE.terracotta, borderColor: PALETTE.sageDark,
+        cornerSize: 40, touchCornerSize: 44, transparentCorners: false, padding: 10,
+        lockRotation: true
       });
 
-      const label = document.getElementById('uploadLabelText');
+      if (uploadedImages[slotIndex]) canvas.remove(uploadedImages[slotIndex]);
+      if (slotPlaceholders[slotIndex]) { canvas.remove(slotPlaceholders[slotIndex]); slotPlaceholders[slotIndex] = null; }
 
-      label.innerText = uploadedImages[targetSlot]
-        ? `Replace Photo ${targetSlot + 1}`
-        : `Upload/Take Selfie ${targetSlot + 1} of ${total}`;
+      uploadedImages[slotIndex] = img;
+      canvas.add(img);
+      canvas.setActiveObject(img);
 
-      const allFilled = total > 0 && uploadedImages.every(Boolean);
-
-      document.getElementById('controls').style.display =
-        allFilled ? 'flex' : 'none';
-
-      const filledCount = uploadedImages.filter(Boolean).length;
-      const statusText = document.getElementById('previewStatusText');
-
-      if (filledCount === total && total > 0) {
-        statusText.innerText = 'Ready to create';
-      } else if (filledCount > 0) {
-        statusText.innerText = `${filledCount} of ${total} photos added`;
-      } else {
-        statusText.innerText = 'Ready to capture';
-      }
-
-      canvas.requestRenderAll();
-    }
-
-
-    // =====================================================
-    // 6. CREATE PHOTO PLACEHOLDERS
-    // =====================================================
-
-    function createPlaceholders() {
-      slotPlaceholders.forEach(p => p && canvas.remove(p));
-      slotPlaceholders = [];
-
-      slotRects.forEach((r, i) => {
-        const rect = new fabric.Rect({
-          left: 0,
-          top: 0,
-          width: r.width,
-          height: r.height,
-          fill: 'rgba(255,255,255,0.65)',
-          strokeWidth: 0
-        });
-
-        const text = new fabric.Text('Photo ' + (i + 1), {
-          originX: 'center',
-          originY: 'center',
-          left: r.width / 2,
-          top: r.height / 2,
-          fontSize: 32,
-          fill: '#88796B',
-          fontFamily: 'Source Sans 3',
-          fontWeight: 700
-        });
-
-        const group = new fabric.Group([rect, text], {
-          left: r.left,
-          top: r.top,
-          selectable: false,
-          evented: false,
-
-          // The font may still be arriving; do not cache a fallback-font render.
-          objectCaching: false
-        });
-
-        canvas.add(group);
-        slotPlaceholders.push(group);
-      });
-    }
-
-
-    // =====================================================
-    // 7. FRAME LOADING (on demand, cached, prefetched)
-    // =====================================================
-
-    // Loads one frame image from the repository once per session.
-    // Same-origin, so the canvas can read its pixels to find the photo windows.
-    function fetchFrame(key) {
-      if (!framePromises[key]) {
-        framePromises[key] = new Promise((resolve, reject) => {
-          const src = framesData[key].src + '?v=' + CONFIG.FRAME_VERSION;
-          const probe = new Image();
-
-          probe.onload = () => resolve(src);
-          probe.onerror = () => reject(new Error('frame failed to load: ' + src));
-          probe.src = src;
-        });
-
-        // Allow a retry later if this attempt failed.
-        framePromises[key].catch(() => { delete framePromises[key]; });
-      }
-
-      return framePromises[key];
-    }
-
-    // Quietly downloads the remaining frames, one after another,
-    // once the first frame is on screen.
-    function prefetchOthers(exceptKey) {
-      const keys = Object.keys(framesData).filter(k => k !== exceptKey && framesData[k]);
-
-      keys.reduce(
-        (chain, k) => chain.then(() => fetchFrame(k)).catch(() => {}),
-        new Promise(resolve => setTimeout(resolve, 800))
-      );
-    }
-
-    let prefetchStarted = false;
-
-
-    // =====================================================
-    // 8. CHANGE FRAME TEMPLATE
-    // =====================================================
-
-    function changeTemplate(key) {
-      if (!framesData[key]) return;
-
-      currentTemplateKey = key;
-
-      const myToken = ++loadToken;
-
-      document.querySelectorAll('.template-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.key === key);
-      });
-
-      // Clear objects belonging to the previous template.
-      uploadedImages.forEach(img => img && canvas.remove(img));
-      slotPlaceholders.forEach(p => p && canvas.remove(p));
-
-      uploadedImages = [];
-      slotPlaceholders = [];
-      slotRects = [];
-      targetSlot = 0;
-
-      canvas.setOverlayImage(null, canvas.renderAll.bind(canvas));
-
-      document.getElementById('controls').style.display = 'none';
-      document.getElementById('slotSelector').innerHTML = '';
-      document.getElementById('previewStatusText').innerText = 'Loading frame…';
-
-      function showLoadError(err) {
-        if (myToken !== loadToken) return;
-
-        console.error('Frame load error:', err);
-
-        document.getElementById('previewStatusText').innerText = 'Frame unavailable';
-
-        Swal.fire(
-          'Unable to load frame',
-          'Please check your connection and tap the frame button again.',
-          'error'
-        );
-      }
-
-      fetchFrame(key).then(function (src) {
-        if (myToken !== loadToken) return;
-
-        const imgEl = new Image();
-
-        imgEl.onload = function () {
-          if (myToken !== loadToken) return;
-
-          const H = Math.round(CANVAS_W * imgEl.height / imgEl.width);
-
-          canvas.setWidth(CANVAS_W);
-          canvas.setHeight(H);
-
-          // Window detection is expensive and its result never changes
-          // for a given frame, so it is computed once per frame.
-          slotRects = windowCache[key] ||
-            (windowCache[key] = detectWindows(imgEl, CANVAS_W, H));
-
-          if (slotRects.length === 0) {
-            Swal.fire(
-              'Frame problem',
-              'No transparent photo window was found in this frame PNG.',
-              'error'
-            );
-            return;
-          }
-
-          uploadedImages = new Array(slotRects.length).fill(null);
-
-          document.getElementById('instructionText').innerText =
-            `This frame requires ${slotRects.length} photo(s). Fill each slot below.`;
-
-          createPlaceholders();
-          buildSlotButtons();
-
-          const overlay = new fabric.Image(imgEl, {
-            originX: 'left',
-            originY: 'top',
-            left: 0,
-            top: 0,
-            scaleX: CANVAS_W / imgEl.width,
-            scaleY: H / imgEl.height,
-            selectable: false,
-            evented: false
-          });
-
-          canvas.setOverlayImage(overlay, canvas.renderAll.bind(canvas));
-
-          refreshUI();
-
-          if (!prefetchStarted) {
-            prefetchStarted = true;
-            prefetchOthers(key);
-          }
-        };
-
-        imgEl.onerror = showLoadError;
-        imgEl.src = src;
-      }).catch(showLoadError);
-    }
-
-
-    // =====================================================
-    // 9. START-UP (no longer waits for fonts)
-    // =====================================================
-
-    if (currentTemplateKey) {
-      changeTemplate(currentTemplateKey);
-    } else {
-      Swal.fire(
-        'Error',
-        'No frame templates could be loaded.',
-        'error'
-      );
-    }
-
-    // Redraw the "Photo n" placeholders once the canvas font has arrived.
-    if (document.fonts && document.fonts.load) {
-      document.fonts.load('700 32px "Source Sans 3"')
-        .then(() => canvas.requestRenderAll())
-        .catch(() => {});
-    }
-
-
-    // =====================================================
-    // 10. SELECT PHOTO SLOT BY TAPPING CANVAS
-    // =====================================================
-
-    canvas.on('mouse:down', function (opt) {
-      let idx = -1;
-
-      if (opt.target && uploadedImages.includes(opt.target)) {
-        idx = uploadedImages.indexOf(opt.target);
-      } else {
-        const p = canvas.getPointer(opt.e);
-
-        idx = slotRects.findIndex(r =>
-          p.x >= r.left &&
-          p.x <= r.left + r.width &&
-          p.y >= r.top &&
-          p.y <= r.top + r.height
-        );
-      }
-
-      if (idx >= 0) {
-        setTargetSlot(idx);
-      }
+      const next = uploadedImages.indexOf(null);
+      if (next !== -1) targetSlot = next;
+      refreshUI();
+      showHint();
     });
+  };
+  reader.onerror = () => Swal.fire('Unable to read photo', 'Please choose the photo again.', 'error');
+  reader.readAsDataURL(file);
+}
 
+// 12. UPLOAD INPUT (gallery or camera)
+document.getElementById('imageLoader').addEventListener('change', function (e) {
+  handleFile(e.target.files[0]);
+  e.target.value = '';
+});
 
-    // =====================================================
-    // 11. ADD PHOTO TO WINDOW
-    // =====================================================
+// 13. DATA URL TO BLOB
+function dataUrlToBlob(dataUrl) {
+  const parts = dataUrl.split(','), mime = parts[0].match(/:(.*?);/)[1], bin = atob(parts[1]);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
 
-    function handleFile(file) {
-      if (!file || slotRects.length === 0) return;
+// 14. DOWNLOAD
+async function downloadPhoto() {
+  canvas.discardActiveObject();
+  canvas.renderAll();
 
-      const slotIndex = targetSlot;
-      const r = slotRects[slotIndex];
-      const tokenAtStart = loadToken;
+  const dataUrl = canvas.toDataURL({ format: 'png', quality: 1 });
+  const blob = dataUrlToBlob(dataUrl);
+  const file = new File([blob], 'Fira&Baqi Wedding Memory.png', { type: 'image/png' });
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-      const reader = new FileReader();
-
-      reader.onload = function (event) {
-        fabric.Image.fromURL(event.target.result, function (img) {
-          if (tokenAtStart !== loadToken) return;
-
-          const scale = Math.max(
-            r.width / img.width,
-            r.height / img.height
-          );
-
-          const clip = new fabric.Rect({
-            left: r.left,
-            top: r.top,
-            width: r.width,
-            height: r.height,
-            absolutePositioned: true
-          });
-
-          img.set({
-            scaleX: scale,
-            scaleY: scale,
-
-            originX: 'center',
-            originY: 'center',
-
-            left: r.left + r.width / 2,
-            top: r.top + r.height / 2,
-
-            clipPath: clip,
-
-            selectable: true,
-            evented: true,
-
-            perPixelTargetFind: true,
-            targetFindTolerance: 4,
-
-            cornerColor: PALETTE.terracotta,
-            borderColor: PALETTE.sageDark,
-
-            cornerSize: 40,
-            touchCornerSize: 44,
-            transparentCorners: false,
-            padding: 10,
-
-            // Keep the photo straight while allowing resize and movement.
-            lockRotation: true
-          });
-
-          if (uploadedImages[slotIndex]) {
-            canvas.remove(uploadedImages[slotIndex]);
-          }
-
-          if (slotPlaceholders[slotIndex]) {
-            canvas.remove(slotPlaceholders[slotIndex]);
-            slotPlaceholders[slotIndex] = null;
-          }
-
-          uploadedImages[slotIndex] = img;
-
-          canvas.add(img);
-          canvas.setActiveObject(img);
-
-          const next = uploadedImages.indexOf(null);
-
-          if (next !== -1) {
-            targetSlot = next;
-          }
-
-          refreshUI();
-        });
-      };
-
-      reader.onerror = function () {
-        Swal.fire(
-          'Unable to read photo',
-          'Please choose the photo again.',
-          'error'
-        );
-      };
-
-      reader.readAsDataURL(file);
+  if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: 'Fira & Baqi Wedding Memory' });
+      return;
+    } catch (err) {
+      if (err && err.name === 'AbortError') return;
     }
+  }
 
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'Fira&Baqi Wedding Memory.png';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 15000);
 
-    // =====================================================
-    // 12. PHOTO UPLOAD INPUT (gallery or camera)
-    // =====================================================
+  Swal.fire({
+    title: 'Your photo is ready',
+    text: 'If the download did not start, press and hold the image and choose Save Image.',
+    imageUrl: dataUrl, imageAlt: 'Wedding memory', imageWidth: 240,
+    confirmButtonText: 'Done', confirmButtonColor: PALETTE.sageDark
+  });
+}
 
-    document.getElementById('imageLoader').addEventListener('change', function (e) {
-      handleFile(e.target.files[0]);
-      e.target.value = '';
-    });
+// 15. SAVE TO GOOGLE DRIVE GUESTBOOK
+function uploadToGuestbook() {
+  canvas.discardActiveObject();
+  canvas.renderAll();
 
+  Swal.fire({
+    title: 'Saving to Guestbook...', html: 'Please wait a moment.',
+    allowOutsideClick: false, didOpen: () => Swal.showLoading()
+  });
 
-    // =====================================================
-    // 13. CONVERT DATA URL TO BLOB
-    // =====================================================
+  const base64Data = canvas.toDataURL({ format: 'png', quality: 1 });
 
-    function dataUrlToBlob(dataUrl) {
-      const parts = dataUrl.split(',');
-      const mime = parts[0].match(/:(.*?);/)[1];
-      const bin = atob(parts[1]);
-      const arr = new Uint8Array(bin.length);
-
-      for (let i = 0; i < bin.length; i++) {
-        arr[i] = bin.charCodeAt(i);
+  // text/plain keeps this a "simple" request, so no CORS preflight is needed.
+  fetch(CONFIG.SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ image: base64Data, token: CONFIG.TOKEN })
+  })
+    .then(res => res.json())
+    .then(function (result) {
+      if (!result || !result.ok) {
+        Swal.fire('Oops!', (result && result.error) || 'The server returned an unexpected response.', 'error');
+        return;
       }
-
-      return new Blob([arr], { type: mime });
-    }
-
-
-    // =====================================================
-    // 14. DOWNLOAD PHOTO TO DEVICE
-    // =====================================================
-
-    async function downloadPhoto() {
-      canvas.discardActiveObject();
-      canvas.renderAll();
-
-      const dataUrl = canvas.toDataURL({
-        format: 'png',
-        quality: 1
-      });
-
-      const blob = dataUrlToBlob(dataUrl);
-
-      const file = new File(
-        [blob],
-        'Fira&Baqi Wedding Memory.png',
-        { type: 'image/png' }
-      );
-
-      const isMobile =
-        /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-        (
-          navigator.platform === 'MacIntel' &&
-          navigator.maxTouchPoints > 1
-        );
-
-      // Mobile share sheet.
-      if (
-        isMobile &&
-        navigator.canShare &&
-        navigator.canShare({ files: [file] })
-      ) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: 'Fira & Baqi Wedding Memory'
-          });
-
-          return;
-        } catch (err) {
-          if (err && err.name === 'AbortError') return;
-          // Continue to standard download if sharing fails.
-        }
-      }
-
-      // Standard download.
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-
-      link.href = url;
-      link.download = 'Fira&Baqi Wedding Memory.png';
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      setTimeout(() => URL.revokeObjectURL(url), 15000);
-
-      // Safety net for in-app browsers.
       Swal.fire({
-        title: 'Your photo is ready',
-        text: 'If the download did not start, press and hold the image and choose Save Image.',
-        imageUrl: dataUrl,
-        imageAlt: 'Wedding memory',
-        imageWidth: 240,
-        confirmButtonText: 'Done',
-        confirmButtonColor: PALETTE.sageDark
+        title: 'Saved successfully!', text: 'Your memory has been added to our guestbook.',
+        icon: 'success', confirmButtonText: 'Done', confirmButtonColor: PALETTE.sageDark
       });
-    }
+    })
+    .catch(() => Swal.fire('Connection Error', 'Failed to reach the server. Please try again.', 'error'));
+}
 
+// 16. ACTION BUTTONS
+document.getElementById('saveBtn').addEventListener('click', uploadToGuestbook);
+document.getElementById('downloadBtn').addEventListener('click', downloadPhoto);
 
-    // =====================================================
-    // 15. SAVE PHOTO TO GOOGLE DRIVE GUESTBOOK
-    // =====================================================
-
-    function uploadToGuestbook() {
-      canvas.discardActiveObject();
-      canvas.renderAll();
-
-      Swal.fire({
-        title: 'Saving to Guestbook...',
-        html: 'Please wait a moment.',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
-
-      const base64Data = canvas.toDataURL({
-        format: 'png',
-        quality: 1
-      });
-
-      // text/plain keeps this a "simple" request, so no CORS preflight is needed.
-      fetch(CONFIG.SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ image: base64Data, token: CONFIG.TOKEN })
-      })
-        .then(function (res) { return res.json(); })
-        .then(function (result) {
-          if (!result || !result.ok) {
-            Swal.fire(
-              'Oops!',
-              (result && result.error) || 'The server returned an unexpected response.',
-              'error'
-            );
-            return;
-          }
-
-          Swal.fire({
-            title: 'Saved successfully!',
-            text: 'Your memory has been added to our guestbook.',
-            icon: 'success',
-            confirmButtonText: 'Done',
-            confirmButtonColor: PALETTE.sageDark
-          });
-        })
-        .catch(function () {
-          Swal.fire(
-            'Connection Error',
-            'Failed to reach the server. Please try again.',
-            'error'
-          );
-        });
-    }
-
-
-    // =====================================================
-    // 16. ACTION BUTTONS
-    // =====================================================
-
-    document.getElementById('saveBtn').addEventListener('click', uploadToGuestbook);
-    document.getElementById('downloadBtn').addEventListener('click', downloadPhoto);
-
-
-    });  // end DOMContentLoaded
-  </script>
+});
+</script>
 </body>
 </html>
