@@ -37,18 +37,17 @@ button,input,label{font-family:inherit}
 button{-webkit-tap-highlight-color:transparent}
 .ico{width:28px;height:28px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 
-/* 2. FLORAL CORNERS (inline SVG; swap for PNGs later if you like) */
-.fl{position:absolute;width:190px;height:190px;pointer-events:none;opacity:.95}
-.fl.tl{top:0;left:0}
-.fl.tr{top:0;right:0;transform:scaleX(-1);opacity:.55}
-.fl.bl{bottom:0;left:0;transform:scaleY(-1);opacity:.55}
-.fl.br{bottom:0;right:0;transform:scale(-1,-1)}
-.fl-small{width:140px;height:140px}
+/* 2. FLORAL CORNERS (cut from the mockup; files sit next to index.html) */
+.fl{position:absolute;height:auto;pointer-events:none;z-index:0;user-select:none}
+.fl.tl{top:0;left:0;width:30%;max-width:210px}
+.fl.tr{top:0;right:0;width:36%;max-width:250px}
+.fl.bl{bottom:0;left:1%;width:33%;max-width:230px}
+.fl.br{bottom:0;right:0;width:34%;max-width:230px}
 
 /* 3. INTRO PAGE */
 .intro-container{
   position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;
-  background:radial-gradient(circle at 0 0,rgba(233,197,179,.45),transparent 40%),var(--bg);overflow:hidden;
+  background:#FCEFE0;overflow:hidden;
 }
 .intro-content{
   position:relative;z-index:1;width:92%;max-width:400px;padding:36px 26px;
@@ -68,7 +67,7 @@ button{-webkit-tap-highlight-color:transparent}
 /* 4. MAIN CONTAINER AND HEADER */
 .app-container{
   position:relative;max-width:680px;margin:0 auto;padding:44px 30px 30px;overflow:hidden;
-  background:linear-gradient(180deg,#FBF4EA,#F9ECDF);
+  background:#FCEFE0;
   border:1px solid rgba(217,185,140,.65);border-radius:26px;box-shadow:0 12px 40px var(--shadow);
 }
 .app-container>*:not(.fl){position:relative;z-index:1}
@@ -199,41 +198,16 @@ input[type="file"]{display:none}
   .section-heading::before,.section-heading::after{max-width:50px}
   .preview-section{padding:10px}
   .btn{min-height:56px}
-  .fl{width:130px;height:130px}
   .wedding-footer::before,.wedding-footer::after{width:36px}
 }
 </style>
 </head>
 
 <body>
-<!-- Reusable floral corner artwork -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs>
-    <g id="rose">
-      <circle r="24" fill="#F3DFCB"/><circle r="17" fill="#E9C5B3"/>
-      <circle r="10" fill="#D98F72"/><circle r="4" fill="#C4694A"/>
-    </g>
-    <symbol id="corner" viewBox="0 0 200 200">
-      <g fill="#98A48D" opacity=".6">
-        <ellipse cx="95" cy="16" rx="32" ry="8" transform="rotate(12 95 16)"/>
-        <ellipse cx="140" cy="30" rx="28" ry="7" transform="rotate(28 140 30)"/>
-        <ellipse cx="16" cy="95" rx="32" ry="8" transform="rotate(78 16 95)"/>
-        <ellipse cx="30" cy="140" rx="28" ry="7" transform="rotate(62 30 140)"/>
-        <ellipse cx="80" cy="70" rx="30" ry="8" transform="rotate(40 80 70)"/>
-        <ellipse cx="55" cy="95" rx="26" ry="7" transform="rotate(55 55 95)"/>
-      </g>
-      <use href="#rose" x="46" y="46"/>
-      <use href="#rose" x="112" y="22" transform="translate(112 22) scale(.6) translate(-112 -22)"/>
-      <use href="#rose" x="22" y="112" transform="translate(22 112) scale(.6) translate(-22 -112)"/>
-      <use href="#rose" x="84" y="84" transform="translate(84 84) scale(.45) translate(-84 -84)"/>
-    </symbol>
-  </defs>
-</svg>
-
 <!-- INTRO PAGE -->
 <div id="introPage" class="intro-container">
-  <svg class="fl tl"><use href="#corner"/></svg>
-  <svg class="fl br"><use href="#corner"/></svg>
+  <img class="fl tl" src="floral-tl.webp" alt="">
+  <img class="fl br" src="floral-br.webp" alt="">
   <div class="intro-content">
     <div class="eyebrow">The Wedding Celebration</div>
     <h1>Fira &amp; Baqi</h1>
@@ -260,10 +234,10 @@ input[type="file"]{display:none}
 <!-- MAIN APP -->
 <div id="mainApp" style="display:none;">
   <main class="app-container">
-    <svg class="fl tl"><use href="#corner"/></svg>
-    <svg class="fl tr fl-small"><use href="#corner"/></svg>
-    <svg class="fl bl fl-small"><use href="#corner"/></svg>
-    <svg class="fl br"><use href="#corner"/></svg>
+    <img class="fl tl" src="floral-tl.webp" alt="">
+    <img class="fl tr" src="floral-tr.webp" alt="">
+    <img class="fl bl" src="floral-bl.webp" alt="">
+    <img class="fl br" src="floral-br.webp" alt="">
 
     <header class="wedding-header">
       <div class="eyebrow">The Wedding Celebration</div>
@@ -288,7 +262,7 @@ input[type="file"]{display:none}
         <svg class="ico" viewBox="0 0 24 24"><path d="M4 8h3l1.6-2.5h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.6"/></svg>
         <span class="upload-label-content">
           <span id="uploadLabelText">Upload / Take Photo</span>
-          <small>Choose from gallery or use your camera</small>
+          <small id="uploadHint">Choose from gallery or use your camera</small>
         </span>
       </label>
     </section>
@@ -458,6 +432,11 @@ function refreshUI() {
     ? `Replace Photo ${targetSlot + 1}`
     : (total > 1 ? `Upload / Take Photo ${targetSlot + 1} of ${total}` : 'Upload / Take Photo');
 
+  document.getElementById('imageLoader').multiple = total > 1;
+  document.getElementById('uploadHint').innerText = total > 1
+    ? 'Select several photos at once, or add them one by one'
+    : 'Choose from gallery or use your camera';
+
   const allFilled = total > 0 && uploadedImages.every(Boolean);
   document.getElementById('controls').style.display = allFilled ? 'flex' : 'none';
 
@@ -596,10 +575,9 @@ canvas.on('mouse:down', function (opt) {
   if (idx >= 0) setTargetSlot(idx);
 });
 
-// 11. ADD PHOTO TO WINDOW
-function handleFile(file) {
-  if (!file || slotRects.length === 0) return;
-  const slotIndex = targetSlot, r = slotRects[slotIndex], tokenAtStart = loadToken;
+// 11. ADD PHOTO TO A WINDOW
+function addPhoto(file, slotIndex) {
+  const r = slotRects[slotIndex], tokenAtStart = loadToken;
   const reader = new FileReader();
 
   reader.onload = function (event) {
@@ -634,9 +612,20 @@ function handleFile(file) {
   reader.readAsDataURL(file);
 }
 
-// 12. UPLOAD INPUT (gallery or camera)
+// One or several files: the first goes to the selected slot, the rest fill the empty slots in order.
+function handleFiles(fileList) {
+  const files = Array.from(fileList || []);
+  if (!files.length || slotRects.length === 0) return;
+  const order = [targetSlot].concat(slotRects.map((_, i) => i).filter(i => i !== targetSlot && !uploadedImages[i]));
+  files.slice(0, order.length).forEach((f, i) => addPhoto(f, order[i]));
+  if (files.length > order.length) {
+    Swal.fire('Extra photos skipped', `This frame has ${slotRects.length} photo window(s), so only the first ${order.length} photo(s) were used.`, 'info');
+  }
+}
+
+// 12. UPLOAD INPUT (gallery or camera; multi-select on frames with several windows)
 document.getElementById('imageLoader').addEventListener('change', function (e) {
-  handleFile(e.target.files[0]);
+  handleFiles(e.target.files);
   e.target.value = '';
 });
 
